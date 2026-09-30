@@ -5,6 +5,7 @@ import { provideStore } from '@ngrx/store';
 import { provideTransloco, TranslocoLoader } from '@jsverse/transloco';
 import { of } from 'rxjs';
 import { scriptReducer } from './state/script.reducer';
+import { runningReducer } from './state/running.reducer';
 
 class InlineTranslocoLoader implements TranslocoLoader {
   getTranslation() {
@@ -22,7 +23,7 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideAnimations(),
     provideRouter([]),
-    provideStore({ script: scriptReducer }),
+    provideStore({ script: scriptReducer, running: runningReducer }),
     provideTransloco({
       config: { availableLangs: ['zh'], defaultLang: 'zh', fallbackLang: 'zh' },
       loader: InlineTranslocoLoader
