@@ -12,15 +12,18 @@ import { TranslocoModule } from '@jsverse/transloco';
 import { Subscription } from 'rxjs';
 import { activateVersion, addVersion, reorderLines, reviewCue, reviewLine, setOnline, toggleRehearsal } from './state/script.actions';
 import { ScriptState, ScriptVersion } from './state/script.reducer';
+import { RunbookComponent } from './runbook/runbook.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, DragDropModule, MatToolbarModule, MatButtonModule, MatCardModule, MatTabsModule, MatChipsModule, MatIconModule, TranslocoModule],
+  imports: [CommonModule, DragDropModule, MatToolbarModule, MatButtonModule, MatCardModule, MatTabsModule, MatChipsModule, MatIconModule, TranslocoModule, RunbookComponent],
   template: `
     <mat-toolbar color="primary" class="topbar">
       <span>{{ 'title' | transloco }}</span>
       <span class="spacer"></span>
+      <button mat-stroked-button [class.active-page]="page==='rehearsal'" (click)="page='rehearsal'">排练稿管控</button>
+      <button mat-stroked-button [class.active-page]="page==='runbook'" (click)="page='runbook'">演出运行台</button>
       <button mat-stroked-button (click)="toggleOnline()">
         {{ ((state$ | async)?.online ? 'online' : 'offline') | transloco }}
       </button>
@@ -29,7 +32,7 @@ import { ScriptState, ScriptVersion } from './state/script.reducer';
       </button>
     </mat-toolbar>
 
-    <main [class.rehearsal]="(state$ | async)?.rehearsalMode">
+    <main [class.rehearsal]="(state$ | async)?.rehearsalMode" *ngIf="page==='rehearsal'">
       <section class="summary">
         <mat-card>
           <mat-card-title>版本控制</mat-card-title>
@@ -80,10 +83,13 @@ import { ScriptState, ScriptVersion } from './state/script.reducer';
 
       <aside class="offline" *ngIf="!(state$ | async)?.online">网络不可用，当前修改已写入本地缓存；恢复网络后需逐条确认合并。</aside>
     </main>
+
+    <app-runbook *ngIf="page==='runbook'"></app-runbook>
   `,
   styles: [`
     .topbar { position: sticky; top: 0; z-index: 4; }
     .spacer { flex: 1; }
+    .active-page { background: rgba(255,255,255,.22); }
     main { max-width: 1180px; margin: 24px auto; padding: 0 18px 48px; }
     main.rehearsal { max-width: 860px; background: #111827; color: #f9fafb; margin-top: 0; }
     main.rehearsal .script, main.rehearsal .compare, main.rehearsal .summary { opacity: .92; }
@@ -102,6 +108,7 @@ import { ScriptState, ScriptVersion } from './state/script.reducer';
   `]
 })
 export class AppComponent implements OnInit, OnDestroy {
+  page: 'rehearsal' | 'runbook' = 'runbook';
   readonly state$ = this.store.select('script');
   readonly activeVersion$ = this.store.select((state) => {
     const script = state.script as ScriptState;

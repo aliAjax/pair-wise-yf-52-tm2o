@@ -6,6 +6,7 @@
     "dev": "ng serve --host 0.0.0.0 --port 62017",
     "start": "ng serve --host 0.0.0.0 --port 62017",
     "build": "ng build",
+    "test:logic": "npx tsc src/app/runbook/runbook.models.ts src/app/runbook/runbook.logic.ts src/app/runbook/runbook.seed.ts src/app/runbook/runbook.logic.spec.ts --outDir /tmp/rb-test --module commonjs --target ES2020 --moduleResolution node --esModuleInterop --strict --skipLibCheck && node /tmp/rb-test/runbook.logic.spec.js",
     "preview": "npx http-server dist/pair-wise-yf-52/browser -p 62017"
   },
   "dependencies": {
